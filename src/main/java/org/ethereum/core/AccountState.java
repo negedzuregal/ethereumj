@@ -2,8 +2,12 @@ package org.ethereum.core;
 
 import static org.ethereum.util.ByteUtil.EMPTY_BYTE_ARRAY;
 import static org.ethereum.crypto.HashUtil.EMPTY_DATA_HASH;
+
 import org.ethereum.util.RLP;
 import org.ethereum.util.RLPList;
+import org.spongycastle.util.encoders.Hex;
+
+import edu.emory.mathcs.backport.java.util.Arrays;
 
 import java.math.BigInteger;
 
@@ -112,5 +116,18 @@ public class AccountState {
 	        this.rlpEncoded = RLP.encodeList(nonce, balance, stateRoot, codeHash);
 		}
 		return rlpEncoded;
+    }
+    
+    
+    public String toString() {
+    	String ret =  "Nonce: " 		+ this.getNonce().toString() 			+ "\n" + 
+    				  "Balance: " 		+ this.getBalance().toString() 			+ "\n";
+    	
+    	if(this.getStateRoot()!= null && !Arrays.equals(this.getStateRoot(), EMPTY_BYTE_ARRAY))
+    		ret += "State Root: " 	+ Hex.toHexString(this.getStateRoot()) 	+ "\n";
+    	if(this.getCodeHash() != null && !Arrays.equals(this.getCodeHash(), EMPTY_DATA_HASH))
+    		ret += "Code Hash: " 	+ Hex.toHexString(this.getCodeHash());
+    	
+    	return ret;
     }
 }

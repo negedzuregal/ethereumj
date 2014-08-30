@@ -59,7 +59,7 @@ public class Block {
     /* Constructors */
     
     public Block(byte[] rawData) {
-    	logger.debug("new Block from RLP encoded [ " + Hex.toHexString(rawData) + " ]");
+    	//logger.debug("new Block from RLP encoded [ " + Hex.toHexString(rawData) + " ]");
         this.rlpEncoded = rawData;
         this.parsed = false;
     }
