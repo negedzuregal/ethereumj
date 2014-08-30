@@ -50,7 +50,7 @@ public class StateExplorerWindow extends JFrame{
         btnSearch.addMouseListener(new MouseAdapter(){
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				
+				searchAccount(textField.getText());
 			}			
         });
 	}
