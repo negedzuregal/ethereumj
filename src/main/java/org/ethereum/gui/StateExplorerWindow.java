@@ -1,5 +1,6 @@
 package org.ethereum.gui;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Image;
 import java.awt.TextArea;
@@ -33,7 +34,10 @@ import org.ethereum.core.Transaction;
 import org.ethereum.db.ContractDetails;
 import org.ethereum.manager.WorldManager;
 import org.ethereum.vm.DataWord;
+import org.ethereum.vm.OpCode;
 import org.ethereum.vm.Program;
+import org.ethereum.vm.ProgramInvoke;
+import org.ethereum.vm.ProgramInvokeFactory;
 import org.ethereum.vm.Program.ProgramListener;
 import org.spongycastle.util.encoders.Hex;
 
@@ -41,7 +45,9 @@ public class StateExplorerWindow extends JFrame{
 	
 	private ToolBar toolBar = null;
 	private JTextField txfAccountAddress;
-	private StateTextArea txaPrinter;
+	private WindowTextArea txaPrinter;
+	//private WindowTextArea txaCode;
+	ProgramPlayDialog codePanel;
 	
 	private JTable tblStateDataTable;
 	private StateDataTableModel dataModel;
@@ -54,8 +60,8 @@ public class StateExplorerWindow extends JFrame{
         Image img = kit.createImage(url);
         this.setIconImage(img);
         setTitle("State Explorer");
-        setSize(700, 660);
-        setLocation(115, 280);
+        setSize(700, 500);
+        setLocation(50, 180);
         setResizable(false);
         
         /*
@@ -86,7 +92,7 @@ public class StateExplorerWindow extends JFrame{
         JPanel centerPanel = new JPanel();
         panel.add(centerPanel);
         
-        txaPrinter = new StateTextArea();
+        txaPrinter = new WindowTextArea();
         centerPanel.add(txaPrinter);
         
         /*
@@ -142,19 +148,20 @@ public class StateExplorerWindow extends JFrame{
         JScrollPane scrollPane = new JScrollPane(tblStateDataTable);
         scrollPane.setPreferredSize(new Dimension(600,200));
         panel.add(scrollPane);
+        
+        /*
+         * bottom Code panel
+         */ 
+//        codePanel = new ProgramPlayDialog();
+//        codePanel.setPreferredSize(new Dimension(600,200));
+//        codePanel.setVisible(true);
+//        codePanel.setBackground(Color.WHITE);
+//        panel.add(codePanel);
 	}
 	
 	private void searchAccount(String accountStr){
 		txaPrinter.clean();
 		txaPrinter.println(accountDetailsString(Hex.decode(accountStr), dataModel));
-//		for (int i =0; i < WorldManager.getInstance().getBlockchain().getSize(); ++i) {
-//            Block block = WorldManager.getInstance().getBlockchain().getByNumber(i);
-//            for(final Transaction tx: block.getTransactionsList()){
-//            	System.out.println(accountDetailsString(tx.getReceiveAddress()));
-//		        System.out.println("\n\n\n\n");
-//			}
-//        }
-//			
 	}
 	
 	private String accountDetailsString(byte[] account, StateDataTableModel dataModel){	
@@ -174,8 +181,9 @@ public class StateExplorerWindow extends JFrame{
 			dataModel.setData(accountStorage);
 		}
 		
+		//4) code print
 		byte[] code = WorldManager.getInstance().getRepository().getCode(account);
-		
+		ProgramPlayDialog.createAndShowGUI(code, null, null);
 		
 		return ret;
 	}
@@ -268,9 +276,9 @@ public class StateExplorerWindow extends JFrame{
 		}
 	}
 	
-	private class StateTextArea extends TextArea {
+	private class WindowTextArea extends TextArea {
 		
-		public StateTextArea() {
+		public WindowTextArea() {
 			super();
 		}
 		
@@ -282,4 +290,13 @@ public class StateExplorerWindow extends JFrame{
 			setText("");
 		}
 	}
+	
+	public static void main(String[] args) {
+        // Start all Swing applications on the EDT.
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                new StateExplorerWindow(null).setVisible(true);
+            }
+        });
+    }
 }

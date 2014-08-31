@@ -55,16 +55,16 @@ public class Repository {
 
     private Logger logger = LoggerFactory.getLogger("repository");
 
-    private Trie 			worldState;
-    private TrackTrie     	accountStateDB;
-    private TrackDatabase 	contractDetailsDB;
+    protected Trie 			worldState;
+    protected TrackTrie     	accountStateDB;
+    protected TrackDatabase 	contractDetailsDB;
 
     // TODO: Listeners listeners
     // TODO: cash impl
 
-    private DatabaseImpl chainDB 	= null;
-    private DatabaseImpl detailsDB 	= null;
-    private DatabaseImpl stateDB 	= null;
+    protected DatabaseImpl chainDB 	= null;
+    protected DatabaseImpl detailsDB 	= null;
+    protected DatabaseImpl stateDB 	= null;
     
     /**
      * Create a new Repository DAO 
@@ -73,10 +73,24 @@ public class Repository {
      * @See loadBlockchain() to update the stateRoot
      */
     public Repository() {
-    	chainDB 			= new DatabaseImpl("blockchain");
-        detailsDB     		= new DatabaseImpl("details");
+    	this("blockchain", "details", "state");
+//    	chainDB 			= new DatabaseImpl("blockchain");
+//        detailsDB     		= new DatabaseImpl("details");
+//        contractDetailsDB 	= new TrackDatabase(detailsDB);
+//        stateDB 			= new DatabaseImpl("state");
+//        worldState 			= new Trie(stateDB.getDb());
+//        accountStateDB 		= new TrackTrie(worldState);
+    }
+    
+    public Repository(String block_chain_db_name, String details_db_name, String state_db_name) {
+    	setDBs(block_chain_db_name, details_db_name, state_db_name);
+    }
+    
+    private void setDBs(String block_chain_db_name, String details_db_name, String state_db_name) {
+    	chainDB 			= new DatabaseImpl(block_chain_db_name);
+        detailsDB     		= new DatabaseImpl(details_db_name);
         contractDetailsDB 	= new TrackDatabase(detailsDB);
-        stateDB 			= new DatabaseImpl("state");
+        stateDB 			= new DatabaseImpl(state_db_name);
         worldState 			= new Trie(stateDB.getDb());
         accountStateDB 		= new TrackTrie(worldState);
     }
