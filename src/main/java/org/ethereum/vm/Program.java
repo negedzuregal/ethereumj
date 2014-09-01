@@ -1,5 +1,7 @@
 package org.ethereum.vm;
 
+import static org.ethereum.vm.OpCode.PUSH1;
+
 import org.ethereum.crypto.HashUtil;
 import org.ethereum.db.ContractDetails;
 import org.ethereum.db.Repository;
@@ -654,6 +656,80 @@ public class Program {
 				listener.output(globalOutput.toString());
 			}
         }
+    }
+    
+    public static String stringify(byte[] code, int index, String result) {    	
+    	if(code == null || code.length == 0)
+    		return result;
+    	
+    	OpCode op = OpCode.code(code[index]);
+    	byte[] continuedCode = null;
+    			
+    	switch(op){
+    	case SUICIDE:
+    	case STOP:
+    	case JUMP:
+    	case SLOAD:
+    	case MLOAD:
+    	case DUP:
+    	case CALLDATALOAD:
+    	case BALANCE:
+    	case ADDRESS:
+    	case NOT:
+    	case NEG:
+    	case RETURN:
+    	case JUMPI:
+    	case SSTORE:
+    	case MSTORE8:
+    	case MSTORE:
+    	case SWAP:
+    	case SHA3:
+    	case BYTE:
+    	case XOR:
+    	case OR:
+    	case AND:
+    	case EQ:
+    	case GT:
+    	case SGT:
+    	case SLT:
+    	case LT:
+    	case EXP:
+    	case SMOD:
+    	case MOD:
+    	case SDIV:
+    	case DIV:
+    	case SUB:
+    	case MUL:
+    	case ADD:
+    	case CREATE:
+    	case CODECOPY:
+    	case CALLDATACOPY:
+    	case CALL:
+    		result += ' ' + op.name() ;
+    		continuedCode = Arrays.copyOfRange(code, index + 1, code.length - (index + 1));
+    		break;
+    		
+    	case PUSH1:  case PUSH2:  case PUSH3:  case PUSH4:  case PUSH5:  case PUSH6:  case PUSH7:  case PUSH8:
+        case PUSH9:  case PUSH10: case PUSH11: case PUSH12: case PUSH13: case PUSH14: case PUSH15: case PUSH16:
+        case PUSH17: case PUSH18: case PUSH19: case PUSH20: case PUSH21: case PUSH22: case PUSH23: case PUSH24:
+        case PUSH25: case PUSH26: case PUSH27: case PUSH28: case PUSH29: case PUSH30: case PUSH31: case PUSH32:
+        	result += ' ' + op.name() + ' ';
+        	
+        	int nPush = op.val() - PUSH1.val() + 1;
+        	byte[] data = Arrays.copyOfRange(code, index+1, index + nPush );
+        	result += Hex.toHexString(data) + ' '; 
+        	
+    		continuedCode = Arrays.copyOfRange(code, index + 1 + nPush, code.length - (index + 1 + nPush));
+        	break;
+    		
+    	default:
+    		result += ' ' + op.name();
+    		continuedCode = Arrays.copyOfRange(code, index + 1, code.length - (index + 1));
+    		break;
+    		
+    	}    	
+    	
+    	return stringify(continuedCode, 0, result);
     }
 
 	public void addListener(ProgramListener listener) {
