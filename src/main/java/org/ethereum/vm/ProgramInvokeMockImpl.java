@@ -3,7 +3,6 @@ package org.ethereum.vm;
 import org.ethereum.crypto.ECKey;
 import org.ethereum.crypto.HashUtil;
 import org.ethereum.db.Repository;
-import org.ethereum.db.RepositoryMocImpl;
 import org.spongycastle.util.encoders.Hex;
 
 /**
@@ -25,7 +24,7 @@ public class ProgramInvokeMockImpl implements ProgramInvoke {
     }
 
     public ProgramInvokeMockImpl() {
-        this.repository = new RepositoryMocImpl();
+        this.repository = new Repository("blockchainMoc", "detailsMoc", "stateMoc");
         this.repository.createAccount(Hex.decode(ownerAddress));
     }
     

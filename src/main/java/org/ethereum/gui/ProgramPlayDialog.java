@@ -102,7 +102,6 @@ public class ProgramPlayDialog extends JPanel implements ActionListener,
         JScrollPane scrollPane = new JScrollPane(console,
                 ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
                 ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-        scrollPane.setBackground(Color.black);
         scrollPane.getVerticalScrollBar().setPreferredSize(new Dimension(10, 0));
 
         add(scrollPane);
