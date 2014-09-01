@@ -194,7 +194,7 @@ public class StateExplorerWindow extends JFrame{
 		// hex = 60036103e7576011601260003960116000f26103e75660005460005360200235602054
 		
 		
-		byte[] code = WorldManager.getInstance().getRepository().getCode(account);
+		byte[] code = Hex.decode("60036103e7576011601260003960116000f26103e75660005460005360200235602054");//WorldManager.getInstance().getRepository().getCode(account);
 		ProgramPlayDialog.createAndShowGUI(code, null, null);
 		ret += "\n\nCode:\n";
 		ret += Program.stringify(code, 0, "");

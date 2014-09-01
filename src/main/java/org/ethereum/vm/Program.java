@@ -666,49 +666,6 @@ public class Program {
     	byte[] continuedCode = null;
     			
     	switch(op){
-    	case SUICIDE:
-    	case STOP:
-    	case JUMP:
-    	case SLOAD:
-    	case MLOAD:
-    	case DUP:
-    	case CALLDATALOAD:
-    	case BALANCE:
-    	case ADDRESS:
-    	case NOT:
-    	case NEG:
-    	case RETURN:
-    	case JUMPI:
-    	case SSTORE:
-    	case MSTORE8:
-    	case MSTORE:
-    	case SWAP:
-    	case SHA3:
-    	case BYTE:
-    	case XOR:
-    	case OR:
-    	case AND:
-    	case EQ:
-    	case GT:
-    	case SGT:
-    	case SLT:
-    	case LT:
-    	case EXP:
-    	case SMOD:
-    	case MOD:
-    	case SDIV:
-    	case DIV:
-    	case SUB:
-    	case MUL:
-    	case ADD:
-    	case CREATE:
-    	case CODECOPY:
-    	case CALLDATACOPY:
-    	case CALL:
-    		result += ' ' + op.name() ;
-    		continuedCode = Arrays.copyOfRange(code, index + 1, code.length - (index + 1));
-    		break;
-    		
     	case PUSH1:  case PUSH2:  case PUSH3:  case PUSH4:  case PUSH5:  case PUSH6:  case PUSH7:  case PUSH8:
         case PUSH9:  case PUSH10: case PUSH11: case PUSH12: case PUSH13: case PUSH14: case PUSH15: case PUSH16:
         case PUSH17: case PUSH18: case PUSH19: case PUSH20: case PUSH21: case PUSH22: case PUSH23: case PUSH24:
@@ -716,19 +673,19 @@ public class Program {
         	result += ' ' + op.name() + ' ';
         	
         	int nPush = op.val() - PUSH1.val() + 1;
-        	byte[] data = Arrays.copyOfRange(code, index+1, index + nPush );
-        	result += Hex.toHexString(data) + ' '; 
+        	byte[] data = Arrays.copyOfRange(code, index+1, index + nPush + 1);
+        	result += new BigInteger(data).toString() + ' ';//Hex.toHexString(data) + ' '; 
         	
-    		continuedCode = Arrays.copyOfRange(code, index + 1 + nPush, code.length - (index + 1 + nPush));
+    		continuedCode = Arrays.copyOfRange(code, index + nPush + 1, code.length);
         	break;
     		
     	default:
     		result += ' ' + op.name();
-    		continuedCode = Arrays.copyOfRange(code, index + 1, code.length - (index + 1));
+    		continuedCode = Arrays.copyOfRange(code, index + 1, code.length);
     		break;
     		
     	}    	
-    	
+
     	return stringify(continuedCode, 0, result);
     }
 
