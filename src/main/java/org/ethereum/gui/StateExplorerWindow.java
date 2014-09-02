@@ -1,6 +1,7 @@
 package org.ethereum.gui;
 
 import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Image;
 import java.awt.TextArea;
@@ -14,6 +15,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
@@ -23,12 +26,14 @@ import java.math.BigInteger;
 import java.util.Map;
 
 import javax.swing.Box;
+import javax.swing.ImageIcon;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.JButton;
+import javax.swing.JToggleButton;
 import javax.swing.SwingUtilities;
 import javax.swing.table.AbstractTableModel;
 
@@ -52,6 +57,7 @@ public class StateExplorerWindow extends JFrame{
 	private JTextField txfAccountAddress;
 	private WindowTextArea txaPrinter;
 	private JButton btnPlayCode;
+	private AccountsListWindow accountsListWindow;
 	ProgramPlayDialog codePanel;
 	
 	private JTable tblStateDataTable;
@@ -66,7 +72,7 @@ public class StateExplorerWindow extends JFrame{
         Image img = kit.createImage(url);
         this.setIconImage(img);
         setTitle("State Explorer");
-        setSize(700, 500);
+        setSize(700, 530);
         setLocation(50, 180);
         setResizable(false);
         
@@ -78,6 +84,31 @@ public class StateExplorerWindow extends JFrame{
         
         Box horizontalBox = Box.createHorizontalBox();
         panel.add(horizontalBox);
+        
+        java.net.URL imageURL = ClassLoader.getSystemResource("buttons/list.png");
+        ImageIcon image = new ImageIcon(imageURL);
+        JToggleButton btnListAccounts = new JToggleButton(""); 
+        btnListAccounts.setIcon(image);
+        btnListAccounts.setContentAreaFilled(true);
+        btnListAccounts.setToolTipText("Serpent Editor");
+        btnListAccounts.setBackground(Color.WHITE);
+        btnListAccounts.setBorderPainted(false);
+        btnListAccounts.setFocusPainted(false);
+        btnListAccounts.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnListAccounts.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+            	SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                       if(accountsListWindow == null)
+                    	   accountsListWindow = new AccountsListWindow();
+                       accountsListWindow.setVisible(true);
+                    }
+                });
+            }
+        });
+        horizontalBox.add(btnListAccounts);
+        
         
         txfAccountAddress = new JTextField();
         horizontalBox.add(txfAccountAddress);
