@@ -12,6 +12,10 @@ import javax.swing.JPanel;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -39,6 +43,7 @@ import org.ethereum.vm.Program;
 import org.ethereum.vm.ProgramInvoke;
 import org.ethereum.vm.ProgramInvokeFactory;
 import org.ethereum.vm.Program.ProgramListener;
+import org.spongycastle.util.encoders.DecoderException;
 import org.spongycastle.util.encoders.Hex;
 
 public class StateExplorerWindow extends JFrame{
@@ -46,11 +51,12 @@ public class StateExplorerWindow extends JFrame{
 	private ToolBar toolBar = null;
 	private JTextField txfAccountAddress;
 	private WindowTextArea txaPrinter;
-	//private WindowTextArea txaCode;
+	private JButton btnPlayCode;
 	ProgramPlayDialog codePanel;
 	
 	private JTable tblStateDataTable;
 	private StateDataTableModel dataModel;
+	String[] dataTypes = {"String", "Hex", "Number"};
 	
 	public StateExplorerWindow(ToolBar toolBar) {
 		this.toolBar = toolBar;
@@ -86,6 +92,17 @@ public class StateExplorerWindow extends JFrame{
 			}			
         });
         
+        btnPlayCode = new JButton("Play Code");
+        horizontalBox.add(btnPlayCode);
+        btnPlayCode.addMouseListener(new MouseAdapter(){
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				byte[] code = WorldManager.getInstance().getRepository().getCode(Hex.decode(txfAccountAddress.getText()));
+				if(code != null)
+					ProgramPlayDialog.createAndShowGUI(code, null, null);
+			}			
+        });
+        
         /*
          * center text panel
          */
@@ -101,9 +118,7 @@ public class StateExplorerWindow extends JFrame{
         // data type choice boxes
         Box Hbox = Box.createHorizontalBox();
         panel.add(Hbox);
-        
-        String[] dataTypes = {"String", "Hex", "Number"};
-        
+                
         Box VBox1 = Box.createVerticalBox();
         VBox1.setAlignmentX(LEFT_ALIGNMENT);
         JLabel l1 = new JLabel("Key Encoding");
@@ -148,20 +163,16 @@ public class StateExplorerWindow extends JFrame{
         JScrollPane scrollPane = new JScrollPane(tblStateDataTable);
         scrollPane.setPreferredSize(new Dimension(600,200));
         panel.add(scrollPane);
-        
-        /*
-         * bottom Code panel
-         */ 
-//        codePanel = new ProgramPlayDialog();
-//        codePanel.setPreferredSize(new Dimension(600,200));
-//        codePanel.setVisible(true);
-//        codePanel.setBackground(Color.WHITE);
-//        panel.add(codePanel);
 	}
 	
 	private void searchAccount(String accountStr){
 		txaPrinter.clean();
-		txaPrinter.println(accountDetailsString(Hex.decode(accountStr), dataModel));
+		
+		byte[] add = null;
+		try { add = Hex.decode(txfAccountAddress.getText()); } 
+		catch(DecoderException ex) {  return; }
+		
+		txaPrinter.println(accountDetailsString(add, dataModel));
 	}
 	
 	private String accountDetailsString(byte[] account, StateDataTableModel dataModel){	
@@ -193,11 +204,11 @@ public class StateExplorerWindow extends JFrame{
 		
 		// hex = 60036103e7576011601260003960116000f26103e75660005460005360200235602054
 		
-		
-		byte[] code = Hex.decode("60036103e7576011601260003960116000f26103e75660005460005360200235602054");//WorldManager.getInstance().getRepository().getCode(account);
-		ProgramPlayDialog.createAndShowGUI(code, null, null);
-		ret += "\n\nCode:\n";
-		ret += Program.stringify(code, 0, "");
+		byte[] code = WorldManager.getInstance().getRepository().getCode(account);
+		if(code != null) {
+			ret += "\n\nCode:\n";
+			ret += Program.stringify(code, 0, "");
+		}
 		
 		return ret;
 	}
@@ -242,7 +253,7 @@ public class StateExplorerWindow extends JFrame{
 
 		@Override
 		public int getColumnCount() {
-			return 2;
+			return columns.length;
 		}
 
 		@Override
