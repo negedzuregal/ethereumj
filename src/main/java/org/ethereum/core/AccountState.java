@@ -119,8 +119,8 @@ public class AccountState {
     
     
     public String toString() {
-    	String ret =  "Nonce: " 		+ this.getNonce().toString() 			+ "\n" + 
-    				  "Balance: " 		+ this.getBalance().toString() 			+ "\n";
+    	String ret =  "Nonce: " 		+ this.getNonce().toString() 							+ "\n" + 
+    				  "Balance: " 		+ Denomination.toFirendlyString(getBalance()) 			+ "\n";
     	
     	if(this.getStateRoot()!= null && !Arrays.areEqual(this.getStateRoot(), EMPTY_BYTE_ARRAY))
     		ret += "State Root: " 	+ Hex.toHexString(this.getStateRoot()) 	+ "\n";

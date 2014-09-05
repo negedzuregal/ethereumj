@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Image;
 import java.awt.Toolkit;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,6 +16,7 @@ import javax.swing.table.AbstractTableModel;
 
 import org.ethereum.core.Account;
 import org.ethereum.core.AccountState;
+import org.ethereum.core.Denomination;
 import org.ethereum.crypto.HashUtil;
 import org.ethereum.manager.WorldManager;
 import org.iq80.leveldb.DBIterator;
@@ -110,8 +112,9 @@ public class AccountsListWindow  extends JFrame {
 				return Hex.toHexString(data.get(rowIndex).address);
 			}
 			else if(columnIndex == 1 ){
-				if(data.get(rowIndex).accountState != null)
-					return data.get(rowIndex).accountState.getBalance().toString();
+				if(data.get(rowIndex).accountState != null) {
+					return Denomination.toFirendlyString(data.get(rowIndex).accountState.getBalance());
+				}
 				return "---";
 			}
 			else {
