@@ -32,7 +32,7 @@ public enum Denomination {
 		return BigInteger.valueOf(10).pow(value);
 	}
 	
-	public static String toFirendlyString(BigInteger value) {
+	public static String toFriendlyString(BigInteger value) {
 		if(value.compareTo(DOUGLAS.value()) == 1 || value.compareTo(DOUGLAS.value()) == 0) {
 			return Float.toString(value.divide(DOUGLAS.value()).floatValue()) +  " DOUGLAS";
 		}
