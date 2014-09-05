@@ -1,5 +1,7 @@
 package org.ethereum.gui;
 
+import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.Image;
 import java.awt.Toolkit;
 import java.util.ArrayList;
@@ -7,16 +9,22 @@ import java.util.List;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
 
 import org.ethereum.core.Account;
+import org.ethereum.core.AccountState;
+import org.ethereum.crypto.HashUtil;
 import org.ethereum.manager.WorldManager;
+import org.iq80.leveldb.DBIterator;
+import org.spongycastle.util.Arrays;
 import org.spongycastle.util.encoders.Hex;
 
 public class AccountsListWindow  extends JFrame {
 	
 	private JTable tblAccountsDataTable;
+	private AccountsDataAdapter adapter;
 	
 	public AccountsListWindow() {
 		java.net.URL url = ClassLoader.getSystemResource("ethereum-icon.png");
@@ -24,7 +32,7 @@ public class AccountsListWindow  extends JFrame {
         Image img = kit.createImage(url);
         this.setIconImage(img);
         setTitle("State Explorer");
-        setSize(400, 500);
+        setSize(700, 500);
         setLocation(50, 180);
         setResizable(false);
         
@@ -32,19 +40,48 @@ public class AccountsListWindow  extends JFrame {
         getContentPane().add(panel);
         
         tblAccountsDataTable = new JTable();
-        tblAccountsDataTable.setModel(new AccountsDataAdapter(new ArrayList<Account>()));
         
+        adapter = new AccountsDataAdapter(new ArrayList<DataClass>());
+        tblAccountsDataTable.setModel(adapter);
         
+        JScrollPane scrollPane = new JScrollPane(tblAccountsDataTable);
+        scrollPane.setPreferredSize(new Dimension(680,490));
+        panel.add(scrollPane);
+     
+        loadAccounts();
 	}
 	
+	private void loadAccounts() {
+		new Thread(){
+			
+			@Override
+			public void run(){
+				DBIterator i = WorldManager.getInstance().getRepository().getContractDetailsDBIterator();
+				while(i.hasNext()) {
+					DataClass dc = new DataClass();
+					dc.address = i.next().getKey();
+					
+					AccountState state = WorldManager.getInstance().getRepository().getAccountState(dc.address);
+					dc.accountState = state;
+					
+					adapter.addDataPiece(dc);
+				}
+			}
+		}.start();
+	}
 	
 	private class AccountsDataAdapter extends AbstractTableModel {
-		List<Account> data;
+		List<DataClass> data;
 		
-		final String[] columns = new String[]{ "Account", "Balance"};
+		final String[] columns = new String[]{ "Account", "Balance", "Is Contract"};
 		
-		public AccountsDataAdapter(List<Account> data) {
+		public AccountsDataAdapter(List<DataClass> data) {
 			this.data = data;
+		}
+		
+		public void addDataPiece(DataClass d) {
+			data.add(d);
+			this.fireTableRowsInserted(Math.min(data.size() - 2, 0), data.size() - 1);
 		}
 
 		@Override
@@ -54,23 +91,42 @@ public class AccountsListWindow  extends JFrame {
 
 		@Override
 		public int getColumnCount() {
-			return 2;
+			return 3;
 		}
 		
 		@Override
 		public String getColumnName(int column) {
 			return columns[column];
 		}
+		
+		@Override
+	    public boolean isCellEditable(int row, int column) { // custom isCellEditable function
+	       return column == 0? true:false;
+	    }
 
 		@Override
 		public Object getValueAt(int rowIndex, int columnIndex) {
 			if(columnIndex == 0) {
-				return Hex.toHexString(data.get(rowIndex).getAddress());
+				return Hex.toHexString(data.get(rowIndex).address);
+			}
+			else if(columnIndex == 1 ){
+				if(data.get(rowIndex).accountState != null)
+					return data.get(rowIndex).accountState.getBalance().toString();
+				return "---";
 			}
 			else {
-				return "";
+				if(data.get(rowIndex).accountState != null) {
+					if(!Arrays.areEqual(data.get(rowIndex).accountState.getCodeHash(), HashUtil.EMPTY_DATA_HASH))
+						return "Yes";
+				}
+				return "No";
 			}
 		}
+	}
+	
+	private class DataClass {
+		public byte[] address;
+		public AccountState accountState;
 	}
 
 }
