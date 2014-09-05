@@ -471,7 +471,9 @@ public class Repository {
         }
     }
 
-
+    public DBIterator getContractDetailsDBIterator() {
+    	return detailsDB.iterator();
+    }
 
 
     public void close() {

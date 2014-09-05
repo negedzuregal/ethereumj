@@ -34,6 +34,7 @@ public class AccountsListWindow  extends JFrame {
         tblAccountsDataTable = new JTable();
         tblAccountsDataTable.setModel(new AccountsDataAdapter(new ArrayList<Account>()));
         
+        
 	}
 	
 	
