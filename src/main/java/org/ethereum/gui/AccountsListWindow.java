@@ -33,7 +33,7 @@ public class AccountsListWindow  extends JFrame {
         Toolkit kit = Toolkit.getDefaultToolkit();
         Image img = kit.createImage(url);
         this.setIconImage(img);
-        setTitle("State Explorer");
+        setTitle("Accounts List");
         setSize(700, 500);
         setLocation(50, 180);
         setResizable(false);
@@ -113,7 +113,7 @@ public class AccountsListWindow  extends JFrame {
 			}
 			else if(columnIndex == 1 ){
 				if(data.get(rowIndex).accountState != null) {
-					return Denomination.toFirendlyString(data.get(rowIndex).accountState.getBalance());
+					return Denomination.toFriendlyString(data.get(rowIndex).accountState.getBalance());
 				}
 				return "---";
 			}

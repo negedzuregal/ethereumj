@@ -224,17 +224,6 @@ public class StateExplorerWindow extends JFrame{
 		}
 		
 		//4) code print
-		
-//		 *** [Init] *** 
-//
-//	     3 999 SSTORE 
-//
-//	     *** [Code] *** 
-//
-//	      999 SLOAD 0 MSTORE 0 MLOAD 32 MUL CALLDATALOAD 32 MSTORE 
-		
-		// hex = 60036103e7576011601260003960116000f26103e75660005460005360200235602054
-		
 		byte[] code = WorldManager.getInstance().getRepository().getCode(account);
 		if(code != null) {
 			ret += "\n\nCode:\n";
