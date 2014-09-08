@@ -19,6 +19,8 @@ import org.ethereum.core.AccountState;
 import org.ethereum.core.Denomination;
 import org.ethereum.crypto.HashUtil;
 import org.ethereum.manager.WorldManager;
+import org.ethereum.trie.AccountIterator;
+import org.ethereum.util.CompactEncoder;
 import org.iq80.leveldb.DBIterator;
 import org.spongycastle.util.Arrays;
 import org.spongycastle.util.encoders.Hex;
@@ -49,6 +51,14 @@ public class AccountsListWindow  extends JFrame {
         JScrollPane scrollPane = new JScrollPane(tblAccountsDataTable);
         scrollPane.setPreferredSize(new Dimension(680,490));
         panel.add(scrollPane);
+        
+        AccountIterator i = new AccountIterator(WorldManager.getInstance().getRepository().getWorldState());
+        System.out.println("Found: " + i.size());
+        while(i.hasNext()) {
+        	byte[] z = i.next();
+        	byte[] k = CompactEncoder.packNibbles(z);
+        	System.out.println(Hex.toHexString(k));
+        }
      
         loadAccounts();
 	}
@@ -59,6 +69,7 @@ public class AccountsListWindow  extends JFrame {
 			@Override
 			public void run(){
 				DBIterator i = WorldManager.getInstance().getRepository().getContractDetailsDBIterator();
+				int z = 1;
 				while(i.hasNext()) {
 					DataClass dc = new DataClass();
 					dc.address = i.next().getKey();
@@ -67,7 +78,11 @@ public class AccountsListWindow  extends JFrame {
 					dc.accountState = state;
 					
 					adapter.addDataPiece(dc);
+					
+					z++;
 				}
+				
+				System.out.println("Should Have Been found: " + z);
 			}
 		}.start();
 	}
